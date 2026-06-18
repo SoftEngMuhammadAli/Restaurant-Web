@@ -1,9 +1,7 @@
-import jwt from 'jsonwebtoken';
 import { ApiError } from '../utils/ApiError.js';
 import { createOpaqueToken, hashToken, signAccessToken, signRefreshToken, verifyRefreshToken } from '../utils/tokens.js';
 import { sendEmail } from '../utils/email.js';
 import { slugify } from '../utils/slugify.js';
-import { config } from '../config/index.js';
 import { ROLES } from '../constants/enums.js';
 import { User } from '../models/User.js';
 import { Restaurant } from '../models/Restaurant.js';

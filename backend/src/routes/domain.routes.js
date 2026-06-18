@@ -1,0 +1,95 @@
+import { Router } from 'express';
+import { CrudController } from '../controllers/CrudController.js';
+import { orderController } from '../controllers/OrderController.js';
+import { tableController } from '../controllers/TableController.js';
+import { paymentController } from '../controllers/PaymentController.js';
+import { analyticsController } from '../controllers/AnalyticsController.js';
+import { uploadController } from '../controllers/UploadController.js';
+import { upload } from '../middlewares/upload.middleware.js';
+import { authenticate, authorizeRoles } from '../middlewares/auth.middleware.js';
+import { validate } from '../middlewares/validate.middleware.js';
+import { createCrudRouter } from './crudRouteFactory.js';
+import { CrudService } from '../services/CrudService.js';
+import { customerService } from '../services/CustomerService.js';
+import { repositories } from '../repositories/domainRepositories.js';
+import { ROLES } from '../constants/enums.js';
+import {
+  categorySchema,
+  addonSchema,
+  customerSchema,
+  menuItemSchema,
+  notificationSchema,
+  orderSchema,
+  orderStatusSchema,
+  paymentSchema,
+  reservationSchema,
+  reviewSchema,
+  restaurantSchema,
+  roleSchema,
+  tableSchema,
+  tableStatusSchema,
+  variantSchema,
+} from '../validators/domain.validator.js';
+import { listQuerySchema } from '../validators/common.validator.js';
+
+const router = Router();
+const staff = [ROLES.SUPER_ADMIN, ROLES.OWNER, ROLES.MANAGER, ROLES.CASHIER, ROLES.WAITER];
+const managers = [ROLES.SUPER_ADMIN, ROLES.OWNER, ROLES.MANAGER];
+
+const categoryController = new CrudController(
+  new CrudService(repositories.categories, { searchableFields: ['name', 'description'] }),
+  'Category',
+);
+const menuItemController = new CrudController(
+  new CrudService(repositories.menuItems, { searchableFields: ['name', 'description', 'tags'] }),
+  'Menu item',
+);
+const reservationController = new CrudController(
+  new CrudService(repositories.reservations, { searchableFields: ['guestName', 'guestPhone'] }),
+  'Reservation',
+);
+const customerController = new CrudController(
+  customerService,
+  'Customer',
+);
+const reviewController = new CrudController(new CrudService(repositories.reviews), 'Review');
+const notificationController = new CrudController(new CrudService(repositories.notifications), 'Notification');
+const addonController = new CrudController(
+  new CrudService(repositories.addons, { searchableFields: ['name'] }),
+  'Addon',
+);
+const variantController = new CrudController(
+  new CrudService(repositories.variants, { searchableFields: ['name', 'sku'] }),
+  'Variant',
+);
+const restaurantController = new CrudController(
+  new CrudService(repositories.restaurants, { scopeByRestaurant: false, searchableFields: ['name', 'slug'] }),
+  'Restaurant',
+);
+const roleController = new CrudController(
+  new CrudService(repositories.roles, { scopeByRestaurant: false, searchableFields: ['name'] }),
+  'Role',
+);
+
+router.use('/restaurants', createCrudRouter({ controller: restaurantController, createSchema: restaurantSchema, roles: [ROLES.SUPER_ADMIN] }));
+router.use('/roles', createCrudRouter({ controller: roleController, createSchema: roleSchema, roles: [ROLES.SUPER_ADMIN] }));
+router.use('/categories', createCrudRouter({ controller: categoryController, createSchema: categorySchema }));
+router.use('/menu-items', createCrudRouter({ controller: menuItemController, createSchema: menuItemSchema }));
+router.use('/addons', createCrudRouter({ controller: addonController, createSchema: addonSchema }));
+router.use('/variants', createCrudRouter({ controller: variantController, createSchema: variantSchema }));
+router.use('/tables', createCrudRouter({ controller: tableController, createSchema: tableSchema, roles: staff }));
+router.patch('/tables/:id/status', authenticate, authorizeRoles(...staff), validate(tableStatusSchema), tableController.updateStatus);
+router.use('/reservations', createCrudRouter({ controller: reservationController, createSchema: reservationSchema, roles: staff }));
+router.use('/customers', createCrudRouter({ controller: customerController, createSchema: customerSchema, roles: managers }));
+router.use('/reviews', createCrudRouter({ controller: reviewController, createSchema: reviewSchema, roles: staff }));
+router.use('/notifications', createCrudRouter({ controller: notificationController, createSchema: notificationSchema, roles: staff }));
+
+router.get('/orders', authenticate, validate(listQuerySchema), orderController.list);
+router.post('/orders', authenticate, authorizeRoles(...staff, ROLES.CUSTOMER), validate(orderSchema), orderController.create);
+router.patch('/orders/:id/status', authenticate, authorizeRoles(...staff, ROLES.CHEF), validate(orderStatusSchema), orderController.updateStatus);
+
+router.post('/payments', authenticate, authorizeRoles(...staff, ROLES.CUSTOMER), validate(paymentSchema), paymentController.create);
+router.get('/analytics/dashboard', authenticate, authorizeRoles(...managers), analyticsController.dashboard);
+router.post('/uploads/images', authenticate, authorizeRoles(...managers), upload.single('image'), uploadController.image);
+
+export const domainRouter = router;

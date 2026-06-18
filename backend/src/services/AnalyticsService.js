@@ -1,10 +1,11 @@
 import { Order } from '../models/Order.js';
 import { Reservation } from '../models/Reservation.js';
 import { Table } from '../models/Table.js';
+import mongoose from 'mongoose';
 
 class AnalyticsService {
   async dashboard(user) {
-    const restaurant = user.restaurant;
+    const restaurant = new mongoose.Types.ObjectId(user.restaurant);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 

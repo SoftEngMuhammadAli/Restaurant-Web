@@ -9,6 +9,8 @@ import { Notification } from '../models/Notification.js';
 import { User } from '../models/User.js';
 import { Addon } from '../models/Addon.js';
 import { Variant } from '../models/Variant.js';
+import { Restaurant } from '../models/Restaurant.js';
+import { Role } from '../models/Role.js';
 import { BaseRepository } from './BaseRepository.js';
 
 export const repositories = {
@@ -23,4 +25,6 @@ export const repositories = {
   users: new BaseRepository(User),
   addons: new BaseRepository(Addon),
   variants: new BaseRepository(Variant),
+  restaurants: new BaseRepository(Restaurant),
+  roles: new BaseRepository(Role),
 };

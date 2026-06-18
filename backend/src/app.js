@@ -28,7 +28,15 @@ export const createApp = () => {
   app.use(apiLimiter);
 
   app.get('/health', (_req, res) => res.json({ ok: true, service: 'restaurant-saas-api' }));
-  app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  app.get('/api/docs.json', (_req, res) => res.json(swaggerSpec));
+  app.use(
+    '/api/docs',
+    swaggerUi.serve,
+    swaggerUi.setup(swaggerSpec, {
+      customSiteTitle: 'Restaurant SaaS API Docs',
+      customCss: '.swagger-ui .topbar { display: none }',
+    }),
+  );
   app.use('/api/v1', apiRouter);
 
   app.use(notFound);
