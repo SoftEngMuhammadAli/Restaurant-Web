@@ -5,11 +5,17 @@ import { Badge } from '../../components/ui/Badge.jsx';
 import { Button } from '../../components/ui/Button.jsx';
 import { orders } from '../../app/demoData.js';
 import { getSocket } from '../../services/socket.js';
+import { useListQuery } from '../../api/apiSlice.js';
 
 const statusColor = { PENDING: 'blue', PREPARING: 'amber', READY: 'green' };
 
 export const KitchenDisplayPage = () => {
   const [tickets, setTickets] = useState(orders);
+  const { data } = useListQuery({ resource: 'orders', params: { limit: 50 } });
+
+  useEffect(() => {
+    if (data?.data?.length) setTickets(data.data);
+  }, [data]);
 
   useEffect(() => {
     const socket = getSocket();

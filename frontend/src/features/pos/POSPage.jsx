@@ -6,18 +6,25 @@ import { Card, CardContent } from '../../components/ui/Card.jsx';
 import { Input } from '../../components/ui/Input.jsx';
 import { Select } from '../../components/ui/Select.jsx';
 import { menuItems, tables } from '../../app/demoData.js';
+import { useListQuery } from '../../api/apiSlice.js';
 
 export const POSPage = () => {
   const [query, setQuery] = useState('');
   const [cart, setCart] = useState([]);
-  const filtered = useMemo(() => menuItems.filter((item) => item.name.toLowerCase().includes(query.toLowerCase())), [query]);
+  const { data: menuData } = useListQuery({ resource: 'menu-items', params: { limit: 100 } });
+  const { data: tableData } = useListQuery({ resource: 'tables', params: { limit: 100 } });
+  const liveMenuItems = menuData?.data?.length ? menuData.data : menuItems;
+  const liveTables = tableData?.data?.length ? tableData.data : tables;
+  const filtered = useMemo(() => liveMenuItems.filter((item) => item.name.toLowerCase().includes(query.toLowerCase())), [liveMenuItems, query]);
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
 
   const add = (item) => {
     setCart((current) => {
-      const existing = current.find((row) => row.id === item.id);
-      if (existing) return current.map((row) => (row.id === item.id ? { ...row, qty: row.qty + 1 } : row));
-      return [...current, { ...item, qty: 1 }];
+      const id = item._id || item.id;
+      const price = item.basePrice ?? item.price ?? 0;
+      const existing = current.find((row) => row.id === id);
+      if (existing) return current.map((row) => (row.id === id ? { ...row, qty: row.qty + 1 } : row));
+      return [...current, { ...item, id, price, image: item.imageUrl || item.image, qty: 1 }];
     });
   };
 
@@ -36,11 +43,14 @@ export const POSPage = () => {
         </div>
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {filtered.map((item) => (
-            <button key={item.id} type="button" onClick={() => add(item)} className="overflow-hidden rounded-lg border bg-card text-left shadow-soft transition hover:-translate-y-0.5">
-              <img src={item.image} alt={item.name} className="aspect-[4/3] w-full object-cover" />
+            <button key={item._id || item.id} type="button" onClick={() => add(item)} className="overflow-hidden rounded-lg border bg-card text-left shadow-soft transition hover:-translate-y-0.5">
+              <img src={item.imageUrl || item.image} alt={item.name} className="aspect-[4/3] w-full object-cover" />
               <div className="p-4">
                 <p className="font-semibold">{item.name}</p>
-                <div className="mt-2 flex items-center justify-between"><span className="text-sm text-muted-foreground">{item.category}</span><Badge color="green">${item.price}</Badge></div>
+                <div className="mt-2 flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">{item.category?.name || item.category || 'Menu'}</span>
+                  <Badge color="green">${(item.basePrice ?? item.price ?? 0).toFixed(2)}</Badge>
+                </div>
               </div>
             </button>
           ))}
@@ -48,7 +58,7 @@ export const POSPage = () => {
       </section>
       <aside className="rounded-lg border bg-card p-4 shadow-soft">
         <div className="grid gap-3 sm:grid-cols-2">
-          <Select label="Table" options={tables.slice(0, 8).map((table) => ({ value: table.number, label: `Table ${table.number}` }))} />
+          <Select label="Table" options={liveTables.slice(0, 8).map((table) => ({ value: table.number, label: `Table ${table.number}` }))} />
           <Select label="Customer" options={[{ value: 'walkin', label: 'Walk-in' }, { value: 'ariana', label: 'Ariana Chen' }]} />
         </div>
         <div className="my-5 grid gap-3">

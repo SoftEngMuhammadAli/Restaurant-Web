@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card.jsx';
 import { Badge } from '../../components/ui/Badge.jsx';
@@ -25,8 +24,8 @@ export const DashboardPage = () => {
         <p className="text-sm text-muted-foreground">Revenue, service velocity, table pressure, and demand signals.</p>
       </div>
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {liveStats.map((item, index) => (
-          <motion.div key={item.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.04 }}>
+        {liveStats.map((item) => (
+          <div key={item.label}>
             <Card>
               <CardContent className="p-4">
                 <p className="text-sm text-muted-foreground">{item.label}</p>
@@ -36,7 +35,7 @@ export const DashboardPage = () => {
                 </div>
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
         ))}
       </section>
       <section className="grid gap-4 xl:grid-cols-[1.5fr_1fr]">

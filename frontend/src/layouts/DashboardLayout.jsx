@@ -7,16 +7,16 @@ import { logout } from '../features/auth/authSlice.js';
 import { cn } from '../utils/cn.js';
 
 const links = [
-  { to: '/', label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/menu', label: 'Menu', icon: Menu },
-  { to: '/orders', label: 'Orders', icon: ShoppingBag },
-  { to: '/tables', label: 'Tables', icon: Table2 },
-  { to: '/reservations', label: 'Reservations', icon: CalendarDays },
-  { to: '/customers', label: 'Customers', icon: Users },
-  { to: '/analytics', label: 'Analytics', icon: BarChart3 },
-  { to: '/pos', label: 'POS', icon: CreditCard },
-  { to: '/kitchen', label: 'Kitchen', icon: ChefHat },
-  { to: '/settings', label: 'Settings', icon: Settings },
+  { to: '/app', label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/app/menu', label: 'Menu', icon: Menu },
+  { to: '/app/orders', label: 'Orders', icon: ShoppingBag },
+  { to: '/app/tables', label: 'Tables', icon: Table2 },
+  { to: '/app/reservations', label: 'Reservations', icon: CalendarDays },
+  { to: '/app/customers', label: 'Customers', icon: Users },
+  { to: '/app/analytics', label: 'Analytics', icon: BarChart3 },
+  { to: '/app/pos', label: 'POS', icon: CreditCard },
+  { to: '/app/kitchen', label: 'Kitchen', icon: ChefHat },
+  { to: '/app/settings', label: 'Settings', icon: Settings },
 ];
 
 export const DashboardLayout = () => {

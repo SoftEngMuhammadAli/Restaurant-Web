@@ -462,6 +462,17 @@ Email: owner@demo.com
 Password: Password123!
 ```
 
+Additional seeded accounts:
+
+```text
+superadmin@demo.com / Password123!
+manager@demo.com / Password123!
+waiter@demo.com / Password123!
+chef@demo.com / Password123!
+cashier@demo.com / Password123!
+ariana@example.com / Password123!
+```
+
 ## Run Locally
 
 Start backend and frontend together:
@@ -620,16 +631,25 @@ Public/auth routes:
 Protected dashboard routes:
 
 ```text
-/
-/menu
-/orders
-/tables
-/reservations
-/customers
-/analytics
-/settings
-/pos
-/kitchen
+/app
+/app/menu
+/app/orders
+/app/tables
+/app/reservations
+/app/customers
+/app/analytics
+/app/settings
+/app/pos
+/app/kitchen
+```
+
+Protected customer routes:
+
+```text
+/checkout
+/account
+/account/orders
+/account/orders/:id
 ```
 
 ## How To Add A New Backend Module
@@ -709,3 +729,225 @@ Before production deployment:
 ## Current Implementation Notes
 
 This repository is a strong production-ready foundation, not a finished commercial SaaS product. The architecture, models, auth, RBAC, sockets, seeders, Docker setup, and UI shell are in place. Some provider integrations and advanced workflows are intentionally scaffolded so they can be connected to real accounts and business rules safely.
+
+---
+
+# USER GUIDE: How to Use as a Customer
+
+This section explains how to use the Restaurant App as a customer to browse menus and place food orders.
+
+## Getting Started
+
+### 1. Access the Application
+
+Open your browser and go to:
+
+```text
+http://localhost:5173
+```
+
+You'll land on the storefront page showing the restaurant menu.
+
+### 2. Create a Customer Account
+
+**Option A: Sign Up as a Customer**
+
+1. Click the **"Order food"** link on the login page
+2. Go to `/register/customer` or click the link from the register page
+3. Fill in the registration form:
+   - **Full Name**: Your name
+   - **Email**: Your email address
+   - **Phone**: Your phone number
+   - **Password**: Create a strong password (min 8 characters)
+   - **Confirm Password**: Re-enter your password
+4. Click **"Create Account"**
+5. You'll be automatically logged in and redirected to the storefront
+
+**Option B: Login with Demo Account**
+
+If demo data has been seeded, use:
+
+```text
+Email: owner@demo.com (or any demo customer account if created)
+Password: Password123!
+```
+
+## Browsing and Ordering
+
+### 1. Browse the Menu
+
+On the storefront page, you can:
+
+- **View all menu items** in a grid layout with images, descriptions, and prices
+- **Filter by category** using the category buttons at the top
+- **See item details** including name, description, category, and price
+- **Track cart count** in the top-right corner showing how many items are in your cart
+
+### 2. Add Items to Cart
+
+1. Click the **"+ Add"** button on any menu item
+2. You'll see a toast notification: `"[Item Name] added to cart!"`
+3. The cart counter in the header will update
+4. Add as many items as you want!
+
+### 3. View Your Cart
+
+Click the **"Cart"** button in the header (shows item count).
+
+In the cart page, you can:
+
+- **See all items** with their quantity and price
+- **Adjust quantities** using the +/- buttons
+- **Remove items** using the trash icon
+- **View subtotal and delivery fee**
+- **See the grand total**
+- **Continue shopping** or **Proceed to Checkout**
+
+### 4. Checkout
+
+1. Click **"Proceed to Checkout"** in the cart
+2. Fill in your delivery details:
+   - **Full Name**: Your name (pre-filled if logged in)
+   - **Email**: Your email (pre-filled if logged in)
+   - **Phone Number**: Your contact number
+   - **Address**: Street address
+   - **City**: Your city
+3. Select your preferences:
+   - **Fulfillment Type**:
+     - Delivery (food will be delivered to your address)
+     - Pickup (collect from restaurant)
+     - Dine In (eat at the restaurant)
+   - **Payment Method**:
+     - Cash on Delivery
+     - Card Payment
+     - EasyPaisa
+   - **Special Instructions** (optional): Any special requests
+4. Click **"Place Order"**
+5. You'll see a success message and be redirected to order tracking
+
+### 5. Track Your Order
+
+After placing an order, you have two ways to track it:
+
+**Option A: Automatic Redirect**
+
+- You'll be automatically taken to the order detail page
+
+**Option B: Orders Page**
+
+- Click **"Orders"** in the navigation to see all your orders
+- Click any order to see full details
+
+**Order Status Timeline:**
+
+- 🟡 **Pending** → Order received, waiting for confirmation
+- 🔵 **Confirmed** → Restaurant confirmed your order
+- 🟣 **Preparing** → Chef is preparing your food
+- 🔵 **Ready** → Food is ready for delivery/pickup
+- 🔷 **Out for Delivery** → On the way to you (if delivery)
+- 🟢 **Delivered** → Order received
+- 🟢 **Completed** → Order completed
+
+### 6. View Your Profile
+
+Click the **"Profile"** button in the header to:
+
+- **See your personal information** (name, email, verification status)
+- **View saved addresses** for quick checkout next time
+- **Add new addresses** for different delivery locations
+- **Change password** (coming soon)
+- **Manage notification preferences** (coming soon)
+- **Sign out** from your account
+
+## Key Features Implemented
+
+✅ **Customer Registration** - Easy sign-up process
+✅ **Menu Browsing** - Filter by categories, view real menu items from backend
+✅ **Shopping Cart** - Add/remove items, adjust quantities
+✅ **Checkout** - Fill in delivery details and place orders
+✅ **Order Tracking** - Real-time order status updates
+✅ **Customer Profile** - Manage account and addresses
+✅ **Authentication** - Secure login with JWT tokens
+✅ **Responsive Design** - Works on mobile and desktop
+
+## Payment Methods
+
+The checkout currently supports these payment methods (configurable):
+
+- **Cash on Delivery** - Pay when food arrives
+- **Card Payment** - Credit/Debit card (stub implementation)
+- **EasyPaisa** - Pakistani mobile payment (stub implementation)
+
+_Note: Payment provider stubs are ready for real integration_
+
+## Troubleshooting
+
+### "No Items Available"
+
+- Make sure the backend is running: `npm run dev -w backend`
+- Check that demo data has been seeded: `npm run seed`
+
+### "Cart is Empty"
+
+- Add items from the storefront by clicking "+ Add" buttons
+
+### "Login Failed"
+
+- Verify your email and password
+- Try the demo account: owner@demo.com / Password123!
+- Ensure the backend is running
+
+### Items Not Showing in Checkout
+
+- The cart uses Redux state management - refresh if needed
+- Make sure you added items before checkout
+
+### Order Not Created
+
+- Ensure all checkout form fields are filled
+- Check that backend is processing orders
+- Look at browser console for error messages
+
+## Tips
+
+- 💡 **Quick Reorder**: Check your order history to quickly re-order favorites
+- 📱 **Mobile Friendly**: The app is fully responsive on mobile devices
+- 🔔 **Get Notifications**: Enable browser notifications to track order updates
+- 💾 **Save Addresses**: Add multiple addresses for faster checkout next time
+- 🔐 **Security**: Your passwords are hashed and never stored in plain text
+
+## API Endpoints Used (For Developers)
+
+Customer-related API endpoints:
+
+```text
+POST   /auth/register              - Create customer account
+POST   /auth/login                 - Log in to account
+GET    /menu-items                 - Fetch all menu items
+GET    /categories                 - Fetch categories
+POST   /orders                     - Create new order
+GET    /orders                     - Get your orders
+GET    /orders/:id                 - Get order details
+GET    /customers/me               - Get profile info
+GET    /addresses                  - Get saved addresses
+POST   /addresses                  - Add new address
+```
+
+All endpoints require authentication except `/auth/register`, `/auth/login`, and public menu endpoints.
+
+## What's Next?
+
+Future enhancements for the customer experience:
+
+- ⏳ Real-time order notifications via Socket.io
+- ⏳ Order reviews and ratings
+- ⏳ Coupon and discount codes
+- ⏳ Loyalty rewards program
+- ⏳ Order scheduling for future delivery
+- ⏳ Payment integration with Stripe/PayPal
+- ⏳ Restaurant search and filtering
+- ⏳ Favorites and saved items
+
+---
+
+**Happy ordering! 🍕**

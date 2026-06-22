@@ -7,7 +7,13 @@ export const validate = (schema) => (req, _res, next) => {
   );
 
   if (error) {
-    return next(new ApiError(422, 'Validation failed', error.details.map((item) => item.message)));
+    return next(
+      new ApiError(
+        422,
+        'Validation failed',
+        error.details.map((item) => item.message),
+      ),
+    );
   }
 
   req.body = value.body || req.body;

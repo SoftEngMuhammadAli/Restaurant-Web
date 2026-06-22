@@ -63,12 +63,57 @@ export const api = createApi({
       invalidatesTags: (_result, _error, arg) => [arg.resource, 'Dashboard'],
     }),
     updateOrderStatus: builder.mutation({
-      query: ({ id, status }) => ({ url: `/orders/${id}/status`, method: 'PATCH', body: { status } }),
+      query: ({ id, status }) => ({
+        url: `/orders/${id}/status`,
+        method: 'PATCH',
+        body: { status },
+      }),
       invalidatesTags: ['Orders', 'Dashboard'],
     }),
     updateTableStatus: builder.mutation({
-      query: ({ id, status }) => ({ url: `/tables/${id}/status`, method: 'PATCH', body: { status } }),
+      query: ({ id, status }) => ({
+        url: `/tables/${id}/status`,
+        method: 'PATCH',
+        body: { status },
+      }),
       invalidatesTags: ['Tables', 'Dashboard'],
+    }),
+    // Customer/Storefront API endpoints
+    getMenuItems: builder.query({
+      query: (params = {}) => ({ url: '/menu-items', params }),
+      providesTags: ['MenuItems'],
+    }),
+    getCategories: builder.query({
+      query: (params = {}) => ({ url: '/categories', params }),
+      providesTags: ['Categories'],
+    }),
+    createOrder: builder.mutation({
+      query: (body) => ({ url: '/orders', method: 'POST', body }),
+      invalidatesTags: ['Orders'],
+    }),
+    getMyOrders: builder.query({
+      query: (params = {}) => ({ url: '/orders', params }),
+      providesTags: ['Orders'],
+    }),
+    getOrderDetail: builder.query({
+      query: (id) => ({ url: `/orders/${id}` }),
+      providesTags: (_result, _error, id) => ['Orders', { type: 'Orders', id }],
+    }),
+    getCustomerProfile: builder.query({
+      query: () => ({ url: '/me' }),
+      providesTags: ['Customers'],
+    }),
+    updateCustomerProfile: builder.mutation({
+      query: (body) => ({ url: '/me', method: 'PUT', body }),
+      invalidatesTags: ['Customers'],
+    }),
+    getMyAddresses: builder.query({
+      query: () => ({ url: '/me/addresses' }),
+      providesTags: ['Customers'],
+    }),
+    addAddress: builder.mutation({
+      query: (body) => ({ url: '/me/addresses', method: 'POST', body }),
+      invalidatesTags: ['Customers'],
     }),
   }),
 });
@@ -83,4 +128,13 @@ export const {
   useRemoveMutation,
   useUpdateOrderStatusMutation,
   useUpdateTableStatusMutation,
+  useGetMenuItemsQuery,
+  useGetCategoriesQuery,
+  useCreateOrderMutation,
+  useGetMyOrdersQuery,
+  useGetOrderDetailQuery,
+  useGetCustomerProfileQuery,
+  useUpdateCustomerProfileMutation,
+  useGetMyAddressesQuery,
+  useAddAddressMutation,
 } = api;

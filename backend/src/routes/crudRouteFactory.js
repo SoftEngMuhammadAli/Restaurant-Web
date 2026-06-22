@@ -6,7 +6,12 @@ import { ROLES } from '../constants/enums.js';
 
 const staffRoles = [ROLES.SUPER_ADMIN, ROLES.OWNER, ROLES.MANAGER];
 
-export const createCrudRouter = ({ controller, createSchema, updateSchema = createSchema, roles = staffRoles }) => {
+export const createCrudRouter = ({
+  controller,
+  createSchema,
+  updateSchema = createSchema,
+  roles = staffRoles,
+}) => {
   const router = Router();
 
   router.use(authenticate);

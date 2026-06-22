@@ -11,6 +11,10 @@ export const orderController = {
     const order = await orderService.create({ user: req.user, payload: req.body });
     sendCreated(res, order, 'Order created');
   }),
+  get: asyncHandler(async (req, res) => {
+    const order = await orderService.get({ user: req.user, id: req.params.id });
+    sendSuccess(res, { message: 'Order detail', data: order });
+  }),
   updateStatus: asyncHandler(async (req, res) => {
     const order = await orderService.updateStatus({ user: req.user, id: req.params.id, status: req.body.status });
     sendSuccess(res, { message: 'Order status updated', data: order });

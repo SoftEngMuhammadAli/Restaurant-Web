@@ -2,6 +2,7 @@ import { CalendarPlus } from 'lucide-react';
 import { Button } from '../../components/ui/Button.jsx';
 import { Card, CardContent } from '../../components/ui/Card.jsx';
 import { Table, Td, Th } from '../../components/ui/Table.jsx';
+import { useListQuery } from '../../api/apiSlice.js';
 
 const reservations = [
   { name: 'Nora Patel', time: '7:00 PM', party: 4, table: 'T6', status: 'CONFIRMED' },
@@ -9,7 +10,11 @@ const reservations = [
   { name: 'Sofia Ray', time: '8:15 PM', party: 6, table: 'T10', status: 'CONFIRMED' },
 ];
 
-export const ReservationsPage = () => (
+export const ReservationsPage = () => {
+  const { data } = useListQuery({ resource: 'reservations', params: { limit: 50 } });
+  const rows = data?.data?.length ? data.data : reservations;
+
+  return (
   <div className="grid gap-5">
     <div className="flex items-end justify-between">
       <div>
@@ -22,9 +27,10 @@ export const ReservationsPage = () => (
       <CardContent className="p-0">
         <Table>
           <thead><tr><Th>Guest</Th><Th>Time</Th><Th>Party</Th><Th>Table</Th><Th>Status</Th></tr></thead>
-          <tbody>{reservations.map((item) => <tr key={item.name}><Td>{item.name}</Td><Td>{item.time}</Td><Td>{item.party}</Td><Td>{item.table}</Td><Td>{item.status}</Td></tr>)}</tbody>
+          <tbody>{rows.map((item) => <tr key={item._id || item.name}><Td>{item.guestName || item.name}</Td><Td>{item.startsAt ? new Date(item.startsAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : item.time}</Td><Td>{item.partySize || item.party}</Td><Td>{item.table?.number || item.table}</Td><Td>{item.status}</Td></tr>)}</tbody>
         </Table>
       </CardContent>
     </Card>
   </div>
-);
+  );
+};

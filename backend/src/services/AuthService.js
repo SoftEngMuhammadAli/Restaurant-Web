@@ -5,6 +5,7 @@ import { slugify } from '../utils/slugify.js';
 import { ROLES } from '../constants/enums.js';
 import { User } from '../models/User.js';
 import { Restaurant } from '../models/Restaurant.js';
+import { CustomerProfile } from '../models/CustomerProfile.js';
 import { roleRepository } from '../repositories/RoleRepository.js';
 import { userRepository } from '../repositories/UserRepository.js';
 
@@ -33,6 +34,23 @@ class AuthService {
       });
       user.restaurant = restaurant._id;
       await user.save();
+    }
+
+    if (role.name === ROLES.CUSTOMER) {
+      const restaurant =
+        (payload.restaurantSlug && (await Restaurant.findOne({ slug: payload.restaurantSlug, deletedAt: null }))) ||
+        (await Restaurant.findOne({ slug: 'demo-bistro', deletedAt: null })) ||
+        (await Restaurant.findOne({ deletedAt: null }).sort('createdAt'));
+
+      if (restaurant) {
+        user.restaurant = restaurant._id;
+        await user.save();
+        await CustomerProfile.findOneAndUpdate(
+          { user: user._id },
+          { user: user._id, restaurant: restaurant._id, loyaltyPoints: 120, deletedAt: null },
+          { upsert: true, new: true, setDefaultsOnInsert: true },
+        );
+      }
     }
 
     const verificationToken = createOpaqueToken();
@@ -144,6 +162,7 @@ class AuthService {
       id: user._id,
       name: user.name,
       email: user.email,
+      phone: user.phone,
       role: user.role?.name,
       restaurant: user.restaurant,
       isEmailVerified: user.isEmailVerified,

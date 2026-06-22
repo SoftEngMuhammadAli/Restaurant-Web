@@ -1,4 +1,4 @@
-import { ORDER_STATUS } from '../constants/enums.js';
+import { ORDER_STATUS, ROLES } from '../constants/enums.js';
 import { ApiError } from '../utils/ApiError.js';
 import { Order } from '../models/Order.js';
 import { MenuItem } from '../models/MenuItem.js';
@@ -7,6 +7,7 @@ import { emitRestaurantEvent } from '../sockets/index.js';
 class OrderService {
   async list({ user, query }) {
     const filter = { restaurant: user.restaurant, deletedAt: null };
+    if (user.role === ROLES.CUSTOMER) filter.customer = user.id;
     if (query.status) filter.status = query.status;
     const page = Number(query.page || 1);
     const limit = Number(query.limit || 20);
@@ -19,6 +20,15 @@ class OrderService {
       Order.countDocuments(filter),
     ]);
     return { items, meta: { page, limit, total, pages: Math.ceil(total / limit) || 1 } };
+  }
+
+  async get({ user, id }) {
+    const filter = { _id: id, restaurant: user.restaurant, deletedAt: null };
+    if (user.role === ROLES.CUSTOMER) filter.customer = user.id;
+
+    const order = await Order.findOne(filter).populate('table customer');
+    if (!order) throw new ApiError(404, 'Order not found');
+    return order;
   }
 
   async create({ user, payload }) {
@@ -47,7 +57,7 @@ class OrderService {
       orderNumber: `ORD-${Date.now()}`,
       type: payload.type,
       table: payload.table,
-      customer: payload.customer,
+      customer: user.role === ROLES.CUSTOMER ? user.id : payload.customer,
       items,
       subtotal,
       taxTotal,

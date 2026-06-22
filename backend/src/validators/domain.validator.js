@@ -176,3 +176,25 @@ export const roleSchema = Joi.object({
     system: Joi.boolean(),
   }),
 });
+
+export const userProfileSchema = Joi.object({
+  body: Joi.object({
+    name: Joi.string().min(2).max(80).required(),
+    phone: Joi.string().allow('', null),
+    preferences: Joi.array().items(Joi.string()),
+    notes: Joi.string().allow('', null),
+  }),
+});
+
+export const addressSchema = Joi.object({
+  body: Joi.object({
+    label: Joi.string().min(2).max(40).default('Home'),
+    line1: Joi.string().min(3).required(),
+    line2: Joi.string().allow('', null),
+    city: Joi.string().min(2).required(),
+    state: Joi.string().allow('', null),
+    country: Joi.string().min(2).required(),
+    postalCode: Joi.string().allow('', null),
+    isDefault: Joi.boolean(),
+  }),
+});
