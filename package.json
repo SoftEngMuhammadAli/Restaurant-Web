@@ -1,19 +1,19 @@
 {
-  "name": "restaurant-saas-platform",
+  "name": "single-restaurant-platform",
   "version": "1.0.0",
   "private": true,
-  "description": "Production-ready MERN SaaS restaurant management and online ordering platform.",
+  "description": "Single-restaurant MERN management and online ordering platform.",
   "workspaces": [
-    "backend",
-    "frontend"
+    "server",
+    "client"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev -w backend\" \"npm run dev -w frontend\"",
-    "build": "npm run build -w frontend",
-    "start": "npm run start -w backend",
-    "seed": "npm run seed -w backend",
-    "test": "npm run test -w backend",
-    "lint": "npm run lint -w backend && npm run lint -w frontend",
+    "dev": "concurrently \"npm run dev -w server\" \"npm run dev -w client\"",
+    "build": "npm run build -w client",
+    "start": "npm run start -w server",
+    "seed": "npm run seed -w server",
+    "test": "npm run test -w server",
+    "lint": "npm run lint -w server && npm run lint -w client",
     "format": "prettier --write ."
   },
   "devDependencies": {

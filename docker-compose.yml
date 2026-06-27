@@ -7,31 +7,31 @@ services:
     volumes:
       - mongo-data:/data/db
 
-  backend:
+  server:
     build:
-      context: ./backend
+      context: ./server
     restart: unless-stopped
     env_file:
       - ./.env
     environment:
-      MONGO_URI: mongodb://mongo:27017/restaurant_saas
+      MONGO_URI: mongodb://mongo:27017/restaurant_app
       CLIENT_URL: http://localhost:5173
     ports:
-      - "5000:5000"
+      - "8000:8000"
     depends_on:
       - mongo
 
-  frontend:
+  client:
     build:
-      context: ./frontend
+      context: ./client
     restart: unless-stopped
     environment:
-      VITE_API_URL: http://localhost:5000/api/v1
-      VITE_SOCKET_URL: http://localhost:5000
+      VITE_API_URL: http://localhost:8000/api
+      VITE_SOCKET_URL: http://localhost:8000
     ports:
       - "5173:80"
     depends_on:
-      - backend
+      - server
 
 volumes:
   mongo-data:
